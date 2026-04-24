@@ -1,22 +1,23 @@
-// commitlint.config.js
-export default {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
+    // Bạn có thể thêm các rule tùy chỉnh ở đây nếu muốn
     'type-enum': [
       2,
       'always',
       [
-        'feat', // Tính năng mới
-        'fix', // Sửa lỗi
-        'docs', // Tài liệu
-        'style', // Format code (không thay đổi logic)
-        'refactor', // Tái cấu trúc code
-        'perf', // Cải thiện hiệu năng
-        'test', // Viết unit test
-        'chore', // Thay đổi nhỏ trong build system hoặc thư viện
-        'revert', // Hoàn tác commit trước đó
+        'feat',
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'build',
+        'ci',
+        'chore',
+        'revert',
       ],
     ],
-    'subject-case': [0], // Cho phép viết hoa/thường tự do ở nội dung commit
   },
 };

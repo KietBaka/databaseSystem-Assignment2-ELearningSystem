@@ -89,3 +89,4 @@ Dự án đáp ứng các tiêu chí sau:
 - `Triggers` - Kiểm tra business rules và tự động tính toán giá trị dẫn xuất.
 - `Functions` - Hàm tính toán phức tạp sử dụng cursor và vòng lặp.
 - `Integration` - Kết nối frontend với cơ sở dữ liệu, hiển thị danh sách và tìm kiếm qua stored procedure.
+
