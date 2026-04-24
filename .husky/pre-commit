@@ -1,0 +1,20 @@
+#!/bin/sh
+# Lấy tên branch hiện tại
+local_branch_name=$(git symbolic-ref --short HEAD)
+
+# 1. Nếu là branch main hoặc master, cho phép commit luôn
+if [ "$local_branch_name" = "main" ] || [ "$local_branch_name" = "master" ]; then
+    npx lint-staged
+    exit 0
+fi
+
+# 2. Với các branch khác, bắt buộc tuân thủ chuẩn feature/ hoặc fix/
+valid_branch_regex="^(feature|fix|hotfix|docs)\/[a-z0-9._-]+$"
+if [[ ! $local_branch_name =~ $valid_branch_regex ]]; then
+    echo "❌ Lỗi: Tên branch '$local_branch_name' không đúng chuẩn!"
+    echo "Gợi ý: Đặt tên theo chuẩn feature/<email_cua_ban>"
+    exit 1
+fi
+
+# npx lint-staged (Tạm thời comment dòng này lại)
+echo "Bỏ qua lint-staged cho commit đầu tiên"
