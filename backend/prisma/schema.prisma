@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model answer {
+  att_order      Int
+  student_id     Int
+  quiz_id        Int
+  question_id    Int
+  student_answer String?  @db.Text
+  earned_score   Float?   @db.Float
+  attempt        attempt  @relation(fields: [att_order, student_id, quiz_id], references: [order, student_id, quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_answer_attempt")
+  question       question @relation(fields: [question_id, quiz_id], references: [id, quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_answer_question")
+
+  @@id([att_order, student_id, quiz_id, question_id])
+  @@index([question_id, quiz_id], map: "fk_answer_question")
+}
+
+model attempt {
+  order       Int
+  student_id  Int
+  quiz_id     Int
+  start_time  DateTime? @db.Timestamp(0)
+  submit_time DateTime? @db.Timestamp(0)
+  score       Float?    @db.Float
+  answer      answer[]
+  quiz        quiz      @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_attempt_quiz")
+  student     student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_attempt_student")
+
+  @@id([order, student_id, quiz_id])
+  @@index([quiz_id], map: "fk_attempt_quiz")
+  @@index([student_id], map: "fk_attempt_student")
+}
+
+model chairman_term {
+  dept_id     Int
+  lecturer_id Int
+  start_date  DateTime   @db.Date
+  end_date    DateTime?  @db.Date
+  department  department @relation(fields: [dept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_term_dept")
+  lecturer    lecturer   @relation(fields: [lecturer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_term_lecturer")
+
+  @@id([dept_id, lecturer_id, start_date])
+  @@index([lecturer_id], map: "fk_term_lecturer")
+}
+
+model course {
+  id                    String       @id @db.Char(10)
+  sub_id                Int?
+  lecturer_id           Int?
+  name                  String?      @db.VarChar(255)
+  description           String?      @db.Text
+  num_enrolled_students Int?         @default(0)
+  lecturer              lecturer?    @relation(fields: [lecturer_id], references: [id], onUpdate: NoAction, map: "fk_course_lecturer")
+  subject               subject?     @relation(fields: [sub_id], references: [id], onUpdate: NoAction, map: "course_ibfk_1")
+  enrollment            enrollment[]
+  quiz                  quiz[]
+  section               section[]
+
+  @@index([lecturer_id], map: "fk_course_lecturer")
+  @@index([sub_id], map: "fk_course_subject")
+}
+
+model department {
+  id              Int             @id
+  name            String?         @unique(map: "name") @db.VarChar(255)
+  foundation_date DateTime?       @db.Date
+  chairman_id     Int?
+  chairman_term   chairman_term[]
+  lecturer        lecturer?       @relation(fields: [chairman_id], references: [id], onUpdate: NoAction, map: "fk_dept_chairman")
+  student         student[]
+  subject         subject[]
+  work            work[]
+
+  @@index([chairman_id], map: "fk_dept_chairman")
+}
+
+model enrollment {
+  student_id   Int
+  co_id        String    @db.Char(10)
+  enroll_date  DateTime? @default(now()) @db.Timestamp(0)
+  course_grade Float?    @db.Float
+  is_completed Boolean?  @default(false)
+  course       course    @relation(fields: [co_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_enrollment_course")
+  student      student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_enrollment_student")
+
+  @@id([student_id, co_id])
+  @@index([co_id], map: "fk_enrollment_course")
+}
+
+model interact {
+  student_id    Int
+  lecture_id    Int
+  sec_order     Int
+  co_id         String    @db.Char(10)
+  last_accessed DateTime? @db.Timestamp(0)
+  lecture       lecture   @relation(fields: [lecture_id, sec_order, co_id], references: [id, sec_order, co_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_interact_lecture")
+  student       student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_interact_student")
+
+  @@id([student_id, lecture_id, sec_order, co_id])
+  @@index([lecture_id, sec_order, co_id], map: "fk_interact_lecture")
+}
+
+model lecture {
+  id                    Int
+  sec_order             Int
+  co_id                 String                  @db.Char(10)
+  lecturer_id           Int?
+  title                 String?                 @db.VarChar(255)
+  interact              interact[]
+  lecturer              lecturer?               @relation(fields: [lecturer_id], references: [id], onUpdate: NoAction, map: "fk_lecture_lecturer")
+  section               section                 @relation(fields: [sec_order, co_id], references: [sec_order, co_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_lecture_section")
+  lecture_material_link lecture_material_link[]
+
+  @@id([id, sec_order, co_id])
+  @@index([lecturer_id], map: "fk_lecture_lecturer")
+  @@index([sec_order, co_id], map: "fk_lecture_section")
+}
+
+model lecture_material_link {
+  material_link String  @db.VarChar(255)
+  lecture_id    Int
+  sec_order     Int
+  co_id         String  @db.Char(10)
+  lecture       lecture @relation(fields: [lecture_id, sec_order, co_id], references: [id, sec_order, co_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_material_lecture")
+
+  @@id([material_link, lecture_id, sec_order, co_id])
+  @@index([lecture_id, sec_order, co_id], map: "fk_material_lecture")
+}
+
+model lecturer {
+  id                  Int               @id
+  teaching_experience Int?
+  chairman_term       chairman_term[]
+  course              course[]
+  department          department[]
+  lecture             lecture[]
+  user                user              @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_lecturer_user")
+  lecturer_degree     lecturer_degree[]
+  question            question[]
+  quiz                quiz[]
+  section             section[]
+  work                work[]
+}
+
+model lecturer_degree {
+  degree      String   @db.VarChar(255)
+  lecturer_id Int
+  lecturer    lecturer @relation(fields: [lecturer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "lecturer_degree_ibfk_1")
+
+  @@id([degree, lecturer_id])
+  @@index([lecturer_id], map: "fk_degree_lecturer")
+}
+
+model question {
+  id             Int
+  quiz_id        Int
+  lecturer_id    Int?
+  content        String?   @db.Text
+  correct_answer String?   @db.Text
+  points         Int?
+  answer         answer[]
+  lecturer       lecturer? @relation(fields: [lecturer_id], references: [id], onUpdate: NoAction, map: "fk_question_lecturer")
+  quiz           quiz      @relation(fields: [quiz_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_question_quiz")
+
+  @@id([id, quiz_id])
+  @@index([lecturer_id], map: "fk_question_lecturer")
+  @@index([quiz_id], map: "fk_question_quiz")
+}
+
+model quiz {
+  id           Int        @id
+  co_id        String?    @db.Char(10)
+  lecturer_id  Int?
+  open_time    DateTime?  @db.Timestamp(0)
+  close_time   DateTime?  @db.Timestamp(0)
+  duration     Int?
+  weight       Float?     @db.Float
+  max_attempts Int?
+  attempt      attempt[]
+  question     question[]
+  course       course?    @relation(fields: [co_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_course")
+  lecturer     lecturer?  @relation(fields: [lecturer_id], references: [id], onUpdate: NoAction, map: "fk_quiz_lecturer")
+
+  @@index([co_id], map: "fk_quiz_course")
+  @@index([lecturer_id], map: "fk_quiz_lecturer")
+}
+
+model section {
+  sec_order   Int
+  co_id       String    @db.Char(10)
+  lecturer_id Int?
+  name        String?   @db.VarChar(255)
+  lecture     lecture[]
+  course      course    @relation(fields: [co_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_section_course")
+  lecturer    lecturer? @relation(fields: [lecturer_id], references: [id], onUpdate: NoAction, map: "fk_section_lecturer")
+
+  @@id([sec_order, co_id])
+  @@index([co_id], map: "fk_section_course")
+  @@index([lecturer_id], map: "fk_section_lecturer")
+}
+
+model student {
+  id                    Int          @id
+  dept_id               Int?
+  gpa                   Float?       @default(0) @db.Float
+  earned_credits        Int?         @default(0)
+  num_courses_enrolled  Int?         @default(0)
+  num_courses_completed Int?         @default(0)
+  attempt               attempt[]
+  enrollment            enrollment[]
+  interact              interact[]
+  department            department?  @relation(fields: [dept_id], references: [id], onUpdate: NoAction, map: "student_ibfk_1")
+  user                  user         @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_student_user")
+
+  @@index([dept_id], map: "fk_student_dept")
+}
+
+model subject {
+  id         Int         @id
+  dept_id    Int?
+  name       String?     @db.VarChar(255)
+  credits    Int?
+  syllabus   String?     @db.Text
+  course     course[]
+  department department? @relation(fields: [dept_id], references: [id], onUpdate: NoAction, map: "subject_ibfk_1")
+
+  @@index([dept_id], map: "fk_subject_dept")
+}
+
+model user {
+  id            Int             @id
+  username      String          @unique(map: "username") @db.VarChar(255)
+  password      String          @db.VarChar(255)
+  email         String?         @unique(map: "email") @db.VarChar(255)
+  fullname      String?         @db.VarChar(255)
+  role          String?         @db.VarChar(255)
+  identity      String?         @db.VarChar(255)
+  address       String?         @db.Text
+  lecturer      lecturer?
+  student       student?
+  user_phone_no user_phone_no[]
+}
+
+model user_phone_no {
+  phone_no String @db.VarChar(255)
+  user_id  Int
+  user     user   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_phone_no_ibfk_1")
+
+  @@id([phone_no, user_id])
+  @@index([user_id], map: "fk_user_phone_user")
+}
+
+model work {
+  dept_id     Int
+  lecturer_id Int
+  department  department @relation(fields: [dept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_work_dept")
+  lecturer    lecturer   @relation(fields: [lecturer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_work_lecturer")
+
+  @@id([dept_id, lecturer_id])
+  @@index([lecturer_id], map: "fk_work_lecturer")
+}
