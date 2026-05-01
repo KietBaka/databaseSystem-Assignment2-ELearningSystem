@@ -299,3 +299,134 @@ BEGIN
 END; //
 
 DELIMITER ;
+
+
+DELIMITER //
+
+-- Kiểm tra định dạng CCCD, Mật khẩu và Vai trò hợp lệ
+CREATE TRIGGER before_user_insert_check
+BEFORE INSERT ON USER
+FOR EACH ROW
+BEGIN
+    IF NEW.id_number NOT REGEXP '^[0-9]{12}$' THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Lỗi: Căn cước công dân (ID Number) phải có đúng 12 chữ số.';
+    END IF;
+
+    IF LENGTH(NEW.password) < 12 OR
+       NEW.password NOT REGEXP '[A-Z]' OR
+       NEW.password NOT REGEXP '[a-z]' OR
+       NEW.password NOT REGEXP '[0-9]' OR
+       NEW.password NOT REGEXP '[^a-zA-Z0-9]' THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Lỗi: Mật khẩu phải dài tối thiểu 12 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.';
+    END IF;
+    
+    IF NEW.role NOT IN ('Giảng viên', 'Sinh viên') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Vai trò chỉ nhận giá trị Giảng viên hoặc Sinh viên.';
+    END IF;
+END; //
+
+-- Đảm bảo SĐT có đúng 10 chữ số và bắt đầu bằng số 0
+CREATE TRIGGER before_phone_insert_check
+BEFORE INSERT ON USER_PHONE_NO
+FOR EACH ROW
+BEGIN
+    IF NEW.phone_no NOT REGEXP '^0[0-9]{9}$' THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Lỗi: Số điện thoại phải có chính xác 10 chữ số và bắt đầu bằng số 0.';
+    END IF;
+END; //
+
+-- Kiểm tra tính hợp lệ của nhiệm kỳ và đảm bảo Trưởng khoa phải trực thuộc Khoa
+CREATE TRIGGER before_chairman_insert_check
+BEFORE INSERT ON CHAIRMAN_TERM
+FOR EACH ROW
+BEGIN
+    DECLARE is_working INT;
+
+    IF NEW.end_date <= NEW.start_date THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Lỗi: Ngày kết thúc nhiệm kỳ phải sau ngày bắt đầu.';
+    END IF;
+
+    SELECT COUNT(*) INTO is_working
+    FROM WORK
+    WHERE lecturer_id = NEW.lecturer_id AND dept_id = NEW.dept_id;
+
+    IF is_working = 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Lỗi: Giảng viên làm Trưởng khoa phải công tác tại Khoa này.';
+    END IF;
+END; //
+
+-- Đảm bảo thời gian đóng Quiz phải bằng hoặc sau thời gian mở + thời lượng làm bài
+CREATE TRIGGER before_quiz_insert_check
+BEFORE INSERT ON QUIZ
+FOR EACH ROW
+BEGIN
+    IF NEW.close_time < DATE_ADD(NEW.open_time, INTERVAL NEW.duration MINUTE) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Thời gian đóng phải sau thời gian mở cộng với thời lượng làm bài.';
+    END IF;
+END; //
+
+-- Chặn lưu câu hỏi nếu không thiết lập đáp án đúng
+CREATE TRIGGER before_question_insert_check
+BEFORE INSERT ON QUESTION
+FOR EACH ROW
+BEGIN
+    IF NEW.correct_answer IS NULL OR TRIM(NEW.correct_answer) = '' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Câu hỏi bắt buộc phải có đáp án đúng (Correct_Answer).';
+    END IF;
+END; //
+
+-- Kiểm tra thời gian nộp bài, khung giờ làm bài và giới hạn số lần thi
+CREATE TRIGGER before_attempt_insert_check
+BEFORE INSERT ON ATTEMPT
+FOR EACH ROW
+BEGIN
+    DECLARE q_open, q_close DATETIME;
+    DECLARE v_max_attempts INT;
+    
+    SELECT open_time, close_time, max_attempts INTO q_open, q_close, v_max_attempts
+    FROM QUIZ
+    WHERE id = NEW.quiz_id;
+
+    IF NEW.submit_time <= NEW.start_time THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Thời gian nộp bài phải sau thời gian bắt đầu.';
+    END IF;
+
+    IF NEW.start_time < q_open OR NEW.submit_time > q_close THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Thời gian làm bài nằm ngoài khung cho phép của Quiz.';
+    END IF;
+
+    IF NEW.`order` > v_max_attempts THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Vượt quá số lần làm bài tối đa cho phép.';
+    END IF;
+END; //
+
+-- Tự động cộng tổng điểm (Score) của ATTEMPT từ các câu trả lời (ANSWERS)
+CREATE TRIGGER after_answer_insert_sync_score
+AFTER INSERT ON ANSWERS
+FOR EACH ROW
+BEGIN
+    UPDATE ATTEMPT
+    SET score = (
+        SELECT SUM(earned_score)
+        FROM ANSWERS
+        WHERE student_id = NEW.student_id
+          AND quiz_id = NEW.quiz_id
+          AND `order` = NEW.`order`
+    )
+    WHERE student_id = NEW.student_id
+      AND quiz_id = NEW.quiz_id
+      AND `order` = NEW.`order`;
+END; //
+
+DELIMITER ;
