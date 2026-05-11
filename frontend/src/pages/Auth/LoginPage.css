@@ -1,0 +1,166 @@
+/* Import font chữ Inter cho hiện đại */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Tổng quan trang đăng nhập */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f4f7f6 0%, #c3cfe2 100%); /* Nền xám xanh dịu mắt */
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+}
+
+/* Thẻ đăng nhập ở giữa màn hình */
+.wrapper {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 420px; /* Độ rộng vừa phải để form không bị bè */
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+/* Khu vực Logo và Tiêu đề */
+.logo-box {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-box i {
+    font-size: 48px;
+    color: #2F65CE; /* Màu xanh chủ đạo */
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Các nhóm nhập liệu */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #e1e5eb;
+    border-radius: 10px;
+    padding: 0 15px;
+    transition: all 0.3s ease;
+}
+
+/* Hiệu ứng khi bấm vào ô input */
+.input-wrapper:focus-within {
+    border-color: #2F65CE;
+    box-shadow: 0 0 0 3px rgba(47, 101, 206, 0.1);
+    background-color: #ffffff;
+}
+
+.input-wrapper i {
+    color: #888;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.input-wrapper:focus-within i {
+    color: #2F65CE; /* Đổi màu icon khi focus */
+}
+
+.input-wrapper input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 14px 10px;
+    font-size: 15px;
+    color: #333;
+    outline: none;
+}
+
+.input-wrapper input::placeholder {
+    color: #aaa;
+}
+
+/* Nút Đăng nhập chính */
+.btn-submit {
+    width: 100%;
+    background-color: #2F65CE;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: #1e4ba3;
+}
+
+.btn-submit:active {
+    transform: scale(0.98); /* Hiệu ứng lún xuống khi click */
+}
+
+/* Đường kẻ chia cách */
+.divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 30px 0 20px 0;
+}
+
+/* Khu vực tài khoản Demo */
+.demo-text {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+.demo-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-demo {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e1e5eb;
+    background-color: #ffffff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #444;
+}
+
+.btn-demo:hover {
+    background-color: #f0f4f8;
+    border-color: #cbd4e1;
+    color: #2F65CE;
+}

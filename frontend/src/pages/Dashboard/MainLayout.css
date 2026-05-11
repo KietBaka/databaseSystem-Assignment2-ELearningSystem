@@ -1,0 +1,132 @@
+
+.sidebar-header {
+  background: linear-gradient(135deg, #2F65CE 0%, #2DD4BF 100%);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 20px rgba(47, 101, 206, 0.2);
+}
+
+.sidebar-header i {
+  font-size: 55px; 
+  color: white;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header:hover i {
+  transform: translateY(-5px) scale(1.05);
+}
+
+/* Phần chữ 67ELEARNING */
+.sidebar-header-text {
+  color: white;
+  font-size: 22px;
+  font-weight: 800; /* In đậm chữ */
+  letter-spacing: 1.5px; /* Giãn cách các chữ cái ra một chút cho thoáng */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tạo viền mờ màu đen để chữ dễ đọc hơn */
+}
+/* Lớp nền mờ bao phủ toàn màn hình */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Màu đen trong suốt 50% */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* Đảm bảo nằm trên cùng của tất cả mọi thứ */
+  backdrop-filter: blur(4px); /* Làm mờ nhẹ phần nền phía sau cho xịn */
+}
+
+/* Thẻ nội dung chính của Modal */
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #1e293b;
+  font-size: 20px;
+}
+
+.modal-content p {
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Nút Hủy */
+.btn-cancel {
+  padding: 10px 20px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #e2e8f0;
+  transform: translateY(-5px) scale(1.05);
+}
+
+/* Nút Xác nhận đăng xuất */
+.btn-confirm-logout {
+  padding: 10px 20px;
+  background-color: #ef4444; /* Màu đỏ cảnh báo */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-confirm-logout:hover {
+  background-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transform: translateY(-5px) scale(1.05);
+  
+}
+
+.nav-item.logout.active {
+  background-color: #fee2e2; /* Màu đỏ nhạt */
+  color: #ef4444;           /* Chữ màu đỏ */
+  font-weight: 600;
+}
+
+.nav-item.logout:hover {
+  background-color: #fef2f2;
+  color: #ef4444;
+  transform: translateY(-5px) scale(1.05);
+}
+
+.nav-item:hover{
+    transform: translateY(-5px) scale(1.05);
+    background-color: #f1f5f9;
+}

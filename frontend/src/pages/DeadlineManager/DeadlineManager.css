@@ -1,0 +1,161 @@
+.deadline-container {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
+
+.deadline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.deadline-header h2 {
+  color: #1e293b;
+  margin: 0;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calendar-controls h3 {
+  margin: 0;
+  color: #2F65CE;
+  min-width: 150px;
+  text-align: center;
+}
+
+.btn-month {
+  background: #f1f5f9;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.btn-month:hover {
+  background: #2F65CE;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Lưới Lịch */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 600;
+  color: #64748b;
+  padding: 10px 0;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.calendar-cell {
+  min-height: 120px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s;
+}
+
+.calendar-cell:hover {
+  border-color: #2F65CE;
+}
+
+.calendar-cell.empty {
+  background-color: #f8fafc;
+  border: none;
+}
+
+.day-number {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  align-self: flex-end;
+}
+
+/* Các nhãn Deadline */
+.deadline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.deadline-badge {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.deadline-badge:hover {
+  transform: scale(1.02);
+}
+
+.deadline-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deadline-course {
+  opacity: 0.8;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Màu sắc cho từng loại Deadline */
+.deadline-badge.quiz {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-left: 3px solid #3b82f6;
+}
+
+.deadline-badge.assignment {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-left: 3px solid #ef4444;
+}
+
+.deadline-badge.event {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-left: 3px solid #22c55e;
+}
+/* Tùy chỉnh màu thẻ sự kiện */
+.deadline-badge.quiz {
+  background-color: #fee2e2; /* Màu đỏ nhạt cho Quiz */
+  color: #991b1b;
+  border-left: 3px solid #ef4444;
+}
+
+.deadline-badge.lesson {
+  background-color: #e0f2fe; /* Màu xanh nhạt cho Bài học */
+  color: #075985;
+  border-left: 3px solid #0ea5e9;
+}
